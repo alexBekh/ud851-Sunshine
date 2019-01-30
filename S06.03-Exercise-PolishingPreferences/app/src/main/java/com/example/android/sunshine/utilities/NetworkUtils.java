@@ -66,9 +66,10 @@ public final class NetworkUtils {
      * on the query capabilities of the weather provider that we are using.
      *
      * @param locationQuery The location that will be queried for.
+     * @param units Unit format: metric or imperial.
      * @return The URL to use to query the weather server.
      */
-    public static URL buildUrl(String locationQuery) {
+    public static URL buildUrl(String locationQuery, String units) {
         Uri builtUri = Uri.parse(FORECAST_BASE_URL).buildUpon()
                 .appendQueryParameter(QUERY_PARAM, locationQuery)
                 .appendQueryParameter(FORMAT_PARAM, format)

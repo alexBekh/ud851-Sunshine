@@ -327,6 +327,8 @@ public class MainActivity extends AppCompatActivity implements
         MenuInflater inflater = getMenuInflater();
         /* Use the inflater's inflate method to inflate our menu layout to this menu */
         inflater.inflate(R.menu.forecast, menu);
+    
+        menu.findItem(R.id.action_settings).setIntent(new Intent(this, SettingsActivity.class));
         /* Return true so that the menu is displayed in the Toolbar */
         return true;
     }
