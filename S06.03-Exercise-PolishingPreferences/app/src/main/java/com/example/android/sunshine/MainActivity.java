@@ -21,7 +21,6 @@ import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.LoaderManager.LoaderCallbacks;
-import android.support.v4.content.AsyncTaskLoader;
 import android.support.v4.content.Loader;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.preference.PreferenceManager;
@@ -36,10 +35,6 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import com.example.android.sunshine.data.SunshinePreferences;
-import com.example.android.sunshine.utilities.NetworkUtils;
-import com.example.android.sunshine.utilities.OpenWeatherJsonUtils;
-
-import java.net.URL;
 
 public class MainActivity extends AppCompatActivity implements
         ForecastAdapter.ForecastAdapterOnClickHandler,
@@ -56,8 +51,6 @@ public class MainActivity extends AppCompatActivity implements
     private TextView mErrorMessageDisplay;
     
     private ProgressBar mLoadingIndicator;
-    
-    private static final int FORECAST_LOADER_ID = 0;
     
     // TODO (4) Add a private static boolean flag for preference updates and initialize it to false
     
@@ -125,7 +118,7 @@ public class MainActivity extends AppCompatActivity implements
          * This ID will uniquely identify the Loader. We can use it, for example, to get a handle
          * on our Loader at a later point in time through the support LoaderManager.
          */
-        int loaderId = FORECAST_LOADER_ID;
+        int loaderId = ForecastAsyncTaskLoader.FORECAST_LOADER_ID;
         
         /*
          * From MainActivity, we have implemented the LoaderCallbacks interface with the type of
@@ -175,78 +168,7 @@ public class MainActivity extends AppCompatActivity implements
     @Override
     public Loader<String[]> onCreateLoader(int id, final Bundle loaderArgs)
     {
-        
-        return new AsyncTaskLoader<String[]>(this)
-        {
-            
-            /* This String array will hold and help cache our weather data */
-            String[] mWeatherData = null;
-            
-            /**
-             * Subclasses of AsyncTaskLoader must implement this to take care of loading their data.
-             */
-            @Override
-            protected void onStartLoading()
-            {
-                if (mWeatherData != null)
-                {
-                    deliverResult(mWeatherData);
-                }
-                else
-                {
-                    mLoadingIndicator.setVisibility(View.VISIBLE);
-                    forceLoad();
-                }
-            }
-            
-            /**
-             * This is the method of the AsyncTaskLoader that will load and parse the JSON data
-             * from OpenWeatherMap in the background.
-             *
-             * @return Weather data from OpenWeatherMap as an array of Strings.
-             *         null if an error occurs
-             */
-            @Override
-            public String[] loadInBackground()
-            {
-                
-                String locationQuery = SunshinePreferences
-                        .getPreferredWeatherLocation(MainActivity.this);
-    
-                String unitsFormatQuery = SunshinePreferences
-                        .getPreferredUnitsFormat(MainActivity.this);
-                        
-                URL weatherRequestUrl = NetworkUtils.buildUrl(locationQuery, unitsFormatQuery);
-                Log.d(TAG, "loadInBackground: URL: " + weatherRequestUrl.toString());
-                
-                try
-                {
-                    String jsonWeatherResponse = NetworkUtils
-                            .getResponseFromHttpUrl(weatherRequestUrl);
-                    
-                    String[] simpleJsonWeatherData = OpenWeatherJsonUtils
-                            .getSimpleWeatherStringsFromJson(MainActivity.this, jsonWeatherResponse);
-                    
-                    return simpleJsonWeatherData;
-                }
-                catch (Exception e)
-                {
-                    e.printStackTrace();
-                    return null;
-                }
-            }
-            
-            /**
-             * Sends the result of the load to the registered listener.
-             *
-             * @param data The result of the load
-             */
-            public void deliverResult(String[] data)
-            {
-                mWeatherData = data;
-                super.deliverResult(data);
-            }
-        };
+        return new ForecastAsyncTaskLoader(this, mLoadingIndicator);
     }
     
     /**
@@ -321,12 +243,13 @@ public class MainActivity extends AppCompatActivity implements
      * @param weatherForDay String describing weather details for a particular day
      */
     @Override
-    public void onClick(String weatherForDay)
+    public void onClick(String weatherForDay, int position)
     {
         Context context = this;
         Class destinationClass = DetailActivity.class;
         Intent intentToStartDetailActivity = new Intent(context, destinationClass);
         intentToStartDetailActivity.putExtra(Intent.EXTRA_TEXT, weatherForDay);
+        intentToStartDetailActivity.putExtra(Intent.EXTRA_INDEX, position);
         startActivity(intentToStartDetailActivity);
     }
     
@@ -405,7 +328,8 @@ public class MainActivity extends AppCompatActivity implements
     private void refreshWeatherData()
     {
         mForecastAdapter.setWeatherData(null);
-        getSupportLoaderManager().restartLoader(FORECAST_LOADER_ID, null, this);
+        getSupportLoaderManager().restartLoader(
+                ForecastAsyncTaskLoader.FORECAST_LOADER_ID, null, this);
     }
     
     @Override
