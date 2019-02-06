@@ -329,6 +329,9 @@ public class WeatherProvider extends ContentProvider
         
         SQLiteDatabase db = mOpenHelper.getWritableDatabase();
     
+        if(selection == null)
+            selection = "1";
+        
         int rowsDeleted = db.delete(WeatherContract.WeatherEntry.TABLE_NAME, null, null);
         
         if (rowsDeleted > 0)
