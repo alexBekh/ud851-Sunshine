@@ -23,19 +23,25 @@
         android:inputType="text"
         android:key="@string/pref_location_key"
         android:singleLine="true"
-        android:title="@string/pref_location_label" />
+        android:title="@string/pref_location_label"/>
 
     <ListPreference
         android:defaultValue="@string/pref_units_metric"
         android:entries="@array/pref_units_options"
         android:entryValues="@array/pref_units_values"
         android:key="@string/pref_units_key"
-        android:title="@string/pref_units_label" />
+        android:title="@string/pref_units_label"/>
 
     <!-- TODO (9) Add a new resource file for boolean values in the res directory and call it bools.xml -->
     <!-- TODO (10) Add a boolean value for showing notifications by default to res/bools.xml -->
 
     <!-- TODO (11) Add a checkbox preference for enabling and disabling notifications -->
+    <CheckBoxPreference
+        android:defaultValue="@bool/enable_notifications_default"
+        android:summaryOn="@string/pref_notifications_on"
+        android:summaryOff="@string/pref_notifications_off"
+        android:key="@string/pref_notifications_key"
+        android:title="@string/pref_notifications_label"/>
     <!-- TODO (12) Set the default of whether or not to show preferences using bools.xml -->
 
 </PreferenceScreen>
