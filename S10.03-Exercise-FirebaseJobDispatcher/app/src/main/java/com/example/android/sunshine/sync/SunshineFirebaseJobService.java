@@ -1,3 +1,11 @@
+package com.example.android.sunshine.sync;
+
+import android.os.Handler;
+import android.support.annotation.NonNull;
+
+import com.firebase.jobdispatcher.JobParameters;
+import com.firebase.jobdispatcher.JobService;
+
 /*
  * Copyright (C) 2016 The Android Open Source Project
  *
@@ -14,7 +22,44 @@
  * limitations under the License.
  */
 // TODO (2) Make sure you've imported the jobdispatcher.JobService, not job.JobService
-
+public class SunshineFirebaseJobService extends JobService
+{
+    private Thread mThread;
+    
+    @Override
+    public boolean onStartJob(@NonNull final JobParameters job)
+    {
+        final Handler mainThreadHandler = new Handler();
+        
+        mThread = new Thread(new Runnable()
+        {
+            @Override
+            public void run()
+            {
+                SunshineSyncTask.syncWeather(SunshineFirebaseJobService.this);
+                
+                mainThreadHandler.post(new Runnable()
+                {
+                    @Override
+                    public void run()
+                    {
+                        jobFinished(job, false);
+                    }
+                });
+            }
+        });
+        mThread.start();
+        
+        return false;
+    }
+    
+    @Override
+    public boolean onStopJob(@NonNull JobParameters job)
+    {
+        mThread.interrupt();
+        return true;
+    }
+}
 // TODO (3) Add a class called SunshineFirebaseJobService that extends jobdispatcher.JobService
 
 //  TODO (4) Declare an ASyncTask field called mFetchWeatherTask
