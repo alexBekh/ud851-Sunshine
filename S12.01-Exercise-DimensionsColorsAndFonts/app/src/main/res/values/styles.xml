@@ -23,6 +23,19 @@
         <item name="colorAccent">@color/colorAccent</item>
         <!-- Used for settings preference theme -->
         <item name="preferenceTheme">@style/PreferenceThemeOverlay</item>
+        <item name="android:fontFamily">sans-serif</item>
+        <item name="android:textColor">@color/primaryText</item>
     </style>
 
+    <style name="forecastDetailLabelStyle">
+        <item name="android:textSize">@dimen/forecast_text_size</item>
+        <item name="android:textColor">@color/detailAccentLabel</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:layout_width">wrap_content</item>
+    </style>
+    <style name="temperatureStyle">
+        <item name="android:textSize">@dimen/list_item_low_temperature_text_view_size</item>
+        <item name="android:fontFamily">sans-serif-light</item>
+        <item name="android:textColor">@color/secondaryText</item>
+    </style>
 </resources>
